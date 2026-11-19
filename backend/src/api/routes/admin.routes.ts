@@ -19,6 +19,14 @@ import {
   getFailedSubmissionsHandler,
   retryFailedSubmissionHandler,
 } from "../controllers/oracleSubmission.controller";
+import {
+  createWebhookHandler,
+  listWebhooksHandler,
+  getWebhookHandler,
+  updateWebhookHandler,
+  deleteWebhookHandler,
+  testWebhookHandler,
+} from "../controllers/webhook.controller";
 import { rateLimitMiddleware } from "../middleware/rateLimit.middleware";
 import { adminAuth } from "../middleware/adminAuth";
 import { auditLogMiddleware } from "../middleware/audit-log.middleware";
@@ -77,5 +85,13 @@ router.post(
 // Audit logging (Issue #456, #1258)
 // Supports ?actor=<id>&action=<action> filtering.
 router.get("/audit-logs", getAuditLogsHandler);
+
+// Outbound webhook management (B-145)
+router.get("/webhooks", listWebhooksHandler);
+router.post("/webhooks", createWebhookHandler);
+router.get("/webhooks/:id", getWebhookHandler);
+router.patch("/webhooks/:id", updateWebhookHandler);
+router.delete("/webhooks/:id", deleteWebhookHandler);
+router.post("/webhooks/:id/test", testWebhookHandler);
 
 export default router;

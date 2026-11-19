@@ -142,6 +142,10 @@ model Oracle {
 model AuditLog {
   id            String   @id @default(uuid())
   userId        String
+  actor         String?
+  action        String?
+  targetId      String?
+  diff          Json?
   ipAddress     String
   method        String
   path          String
@@ -172,3 +176,37 @@ model EventLog {
   @@unique([txHash, eventType])
   @@index([processedAt])
 }
+
+// B-145: Signed outbound webhooks for market events
+model WebhookEndpoint {
+  id          String                 @id @default(uuid())
+  url         String
+  secret      String
+  eventTypes  String[]
+  active      Boolean                @default(true)
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  deliveries  WebhookDeliveryLog[]
+
+  @@index([active])
+}
+
+model WebhookDeliveryLog {
+  id           String           @id @default(uuid())
+  endpointId   String
+  endpoint     WebhookEndpoint  @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  eventId      String
+  eventType    String
+  payload      Json
+  statusCode   Int?
+  responseBody String?
+  error        String?
+  attempt      Int              @default(1)
+  deliveredAt  DateTime?
+  createdAt    DateTime         @default(now())
+
+  @@index([endpointId])
+  @@index([eventId])
+  @@index([createdAt])
+}
+

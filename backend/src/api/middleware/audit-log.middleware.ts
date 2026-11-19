@@ -184,7 +184,7 @@ export function auditLogMiddleware(
           requestBody:
             requestBody && Object.keys(requestBody as object).length > 0
               ? (requestBody as Prisma.InputJsonValue)
-              : null,
+              : undefined,
           statusCode,
           timestamp: new Date(),
         },
